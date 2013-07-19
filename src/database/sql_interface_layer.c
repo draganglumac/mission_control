@@ -21,6 +21,7 @@
 #include <jnxc_headers/jnxhash.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <string.h>
 #include <stdio.h>
 int sql_setup_credentials(void)
 {
@@ -38,9 +39,12 @@ int sql_setup_credentials(void)
 int sql_send_query(mysql_result_bucket **results_bucket, const char *querytemplate, ...)
 {
 	char constructed_query[1024];
+	sprintf(constructed_query, "USE %s; ", jnx_hash_get(config, "SQLDATABASE"));
+	char *main_query = constructed_query + strlen(constructed_query);	
+	
 	va_list ap;
 	va_start(ap,querytemplate);
-	vsprintf(constructed_query,querytemplate,ap);
+	vsprintf(main_query,querytemplate,ap);
 	va_end(ap);
 #ifdef DEBUG
 	printf("Sending query -> %s\n",constructed_query);	
